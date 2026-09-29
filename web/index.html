@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"
+>
+
+<title>Voice AI</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:#080b12;
+    color:#fff;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+.container{
+    max-width:600px;
+    margin:auto;
+    padding:18px;
+}
+
+.header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:20px;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:800;
+}
+
+.balance{
+    background:#151b27;
+    padding:10px 14px;
+    border-radius:14px;
+    color:#63e6be;
+    font-weight:700;
+}
+
+.hero{
+    background:
+        linear-gradient(
+            135deg,
+            #141b31,
+            #0e1524
+        );
+
+    padding:25px;
+    border-radius:24px;
+    margin-bottom:16px;
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.3);
+}
+
+.hero h1{
+    margin:0 0 8px;
+    font-size:28px;
+}
+
+.hero p{
+    color:#9da8bb;
+    margin:0;
+    line-height:1.5;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.card{
+    background:#111722;
+    border:1px solid #1d2635;
+    border-radius:20px;
+    padding:20px;
+    cursor:pointer;
+    transition:.15s;
+}
+
+.card:active{
+    transform:scale(.97);
+}
+
+.icon{
+    font-size:30px;
+    margin-bottom:10px;
+}
+
+.title{
+    font-size:17px;
+    font-weight:700;
+}
+
+.desc{
+    color:#8994a8;
+    font-size:13px;
+    margin-top:5px;
+}
+
+.section{
+    margin-top:22px;
+}
+
+.section h2{
+    font-size:18px;
+}
+
+select,
+textarea,
+button{
+    width:100%;
+    border:0;
+    border-radius:15px;
+    padding:14px;
+    font-size:16px;
+}
+
+select,
+textarea{
+    background:#111722;
+    color:white;
+    border:1px solid #253044;
+}
+
+textarea{
+    min-height:150px;
+    resize:none;
+}
+
+button{
+    background:#5b8cff;
+    color:white;
+    font-weight:700;
+    margin-top:10px;
+}
+
+button.green{
+    background:#19a974;
+}
+
+button.red{
+    background:#d94c4c;
+}
+
+.result{
+    margin-top:15px;
+    background:#111722;
+    border-radius:18px;
+    padding:15px;
+    color:#dce3ef;
+    white-space:pre-wrap;
+}
+
+.hidden{
+    display:none;
+}
+
+.small{
+    color:#8994a8;
+    font-size:13px;
+}
+
+.loader{
+    text-align:center;
+    padding:25px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <div class="logo">
+            🎙 Voice AI
+        </div>
+
+        <div
+            class="balance"
+            id="balance"
+        >
+            ...
+        </div>
+
+    </div>
+
+
+    <div class="hero">
+
+        <h1>
+            Tabiiy ovoz. Tezkor AI.
+        </h1>
+
+        <p>
+            Matnni neural ovozga aylantiring
+            yoki ovozli xabarni matnga o'tkazing.
+        </p>
+
+    </div>
+
+
+    <div class="grid">
+
+        <div
+            class="card"
+            onclick="openTTS()"
+        >
+
+            <div class="icon">
+                🔊
+            </div>
+
+            <div class="title">
+                Matn → Ovoz
+            </div>
+
+            <div class="desc">
+                Neural ovoz
+            </div>
+
+        </div>
+
+
+        <div
+            class="card"
+            onclick="openSTT()"
+        >
+
+            <div class="icon">
+                🎙
+            </div>
+
+            <div class="title">
+                Ovoz → Matn
+            </div>
+
+            <div class="desc">
+                Speech recognition
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div
+        class="section hidden"
+        id="tts"
+    >
+
+        <h2>
+            🔊 Matn → Ovoz
+        </h2>
+
+        <select id="voice">
+        </select>
+
+        <textarea
+            id="text"
+            placeholder="Matningizni yozing..."
+        ></textarea>
+
+        <button
+            onclick="sendTTS()"
+        >
+            🔊 Ovoz yaratish
+        </button>
+
+        <div
+            id="ttsResult"
+            class="result hidden"
+        ></div>
+
+    </div>
+
+
+    <div
+        class="section hidden"
+        id="stt"
+    >
+
+        <h2>
+            🎙 Ovoz → Matn
+        </h2>
+
+        <div class="result">
+
+            STT funksiyasi Telegram ichidagi
+            ovozli xabar orqali ishlaydi.
+
+            <br><br>
+
+            Botga qayting va 🎙 Ovoz → Matn
+            tugmasini bosing.
+
+        </div>
+
+    </div>
+
+
+    <div class="section">
+
+        <h2>
+            🌐 Ovozlar
+        </h2>
+
+        <select id="language"></select>
+
+        <button
+            onclick="loadVoices()"
+        >
+            Ovozlarni ko'rish
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const tg =
+    window.Telegram.WebApp;
+
+tg.ready();
+tg.expand();
+
+let voices = [];
+
+
+async function api(path){
+
+    const response =
+        await fetch(
+            path,
+            {
+                headers:{
+                    "X-Telegram-User":
+                        tg.initDataUnsafe?.user?.id || ""
+                }
+            }
+        );
+
+    return response.json();
+}
+
+
+async function loadUser(){
+
+    try{
+
+        const data =
+            await api("/api/me");
+
+        if(data.balance !== undefined){
+
+            document.getElementById(
+                "balance"
+            ).innerText =
+                data.balance.toLocaleString()
+                + " so'm";
+
+        }
+
+    }catch(e){
+
+        console.log(e);
+
+    }
+
+}
+
+
+async function loadLanguages(){
+
+    const data =
+        await api("/api/voices");
+
+    voices = data;
+
+    const lang =
+        document.getElementById(
+            "language"
+        );
+
+    lang.innerHTML = "";
+
+    data.forEach(
+        item => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                item.code;
+
+            option.textContent =
+                item.name;
+
+            lang.appendChild(
+                option
+            );
+
+        }
+    );
+
+    loadVoices();
+
+}
+
+
+function loadVoices(){
+
+    const code =
+        document.getElementById(
+            "language"
+        ).value;
+
+    const item =
+        voices.find(
+            x => x.code === code
+        );
+
+    if(!item)
+        return;
+
+    const select =
+        document.getElementById(
+            "voice"
+        );
+
+    select.innerHTML = "";
+
+    item.voices.forEach(
+        v => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                v.id;
+
+            option.textContent =
+                v.name;
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
+
+
+function openTTS(){
+
+    document.getElementById(
+        "tts"
+    ).classList.remove(
+        "hidden"
+    );
+
+    document.getElementById(
+        "stt"
+    ).classList.add(
+        "hidden"
+    );
+
+}
+
+
+function openSTT(){
+
+    document.getElementById(
+        "stt"
+    ).classList.remove(
+        "hidden"
+    );
+
+    document.getElementById(
+        "tts"
+    ).classList.add(
+        "hidden"
+    );
+
+}
+
+
+async function sendTTS(){
+
+    const text =
+        document.getElementById(
+            "text"
+        ).value.trim();
+
+    if(!text){
+
+        tg.showAlert(
+            "Matn yozing."
+        );
+
+        return;
+    }
+
+    const result =
+        document.getElementById(
+            "ttsResult"
+        );
+
+    result.classList.remove(
+        "hidden"
+    );
+
+    result.innerText =
+        "⏳ Ovoz tayyorlanmoqda...";
+
+    /*
+       Audio yaratish uchun botning
+       Telegram interfeysidan foydalanish
+       mumkin.
+
+       Bu Mini App hozircha
+       boshqaruv paneli sifatida ishlaydi.
+    */
+
+    result.innerText =
+        "✅ Matn qabul qilindi.\n\n"
+        + "TTS uchun botga yuborish "
+        + "funksiyasidan foydalaning.";
+
+}
+
+
+loadUser();
+loadLanguages();
+
+</script>
+
+</body>
+</html>
