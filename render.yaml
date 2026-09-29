@@ -1,52 +1,7 @@
 services:
   - type: web
-    name: voice-ai-bot
+    name: natural-voice
     runtime: python
-
     buildCommand: pip install -r requirements.txt
-
-    startCommand: python bot.py
-
-    envVars:
-
-      - key: BOT_TOKEN
-        sync: false
-
-      - key: ADMIN_ID
-        sync: false
-
-      - key: CARD_NUMBER
-        sync: false
-
-      - key: CARD_OWNER
-        sync: false
-
-      - key: WEB_URL
-        sync: false
-
-      - key: START_BONUS
-        value: "2000"
-
-      - key: REF_BONUS
-        value: "500"
-
-      - key: TTS_PRICE
-        value: "0.3"
-
-      - key: STT_PRICE
-        value: "5"
-
-      - key: MAX_TTS
-        value: "3000"
-
-      - key: MAX_STT_SECONDS
-        value: "120"
-
-      - key: MIN_TOPUP
-        value: "1000"
-
-      - key: BOT_ON
-        value: "1"
-
-      - key: PORT
-        value: "10000"
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    plan: free
