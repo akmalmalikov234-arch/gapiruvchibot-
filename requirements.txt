@@ -1,0 +1,5 @@
+python-telegram-bot==21.6
+edge-tts
+SpeechRecognition
+imageio-ffmpeg
+Flask
